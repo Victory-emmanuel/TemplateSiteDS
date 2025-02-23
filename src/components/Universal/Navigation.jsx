@@ -1,10 +1,14 @@
+// // src\components\Universal\Navigation.jsx
+
 import { useState } from "react";
-import { NavLink } from "react-router-dom";
+import { NavLink, Link } from "react-router-dom";
 import {
   Navbar,
   Collapse,
   IconButton,
   Typography,
+  Avatar,
+  Button,
 } from "@material-tailwind/react";
 import { motion } from "framer-motion";
 import {
@@ -13,7 +17,8 @@ import {
   Bars3Icon,
   XMarkIcon,
 } from "@heroicons/react/24/solid";
-import { Link } from "react-router-dom";
+import { useAuth } from "../../contexts/AuthContext"; // NEW IMPORT
+import { googleLogin, logout } from "../../firebase/auth"; // NEW IMPORT
 
 const NavLinks = [
   { name: "Home", path: "/" },
@@ -25,10 +30,21 @@ const NavLinks = [
 const Navigation = () => {
   const [open, setOpen] = useState(false);
   const [darkMode, setDarkMode] = useState(false);
+  const { user } = useAuth(); // GET USER AUTH STATE
 
   const toggleTheme = () => {
     document.documentElement.classList.toggle("dark");
     setDarkMode(!darkMode);
+  };
+
+  const handleLogout = async () => {
+    // NEW LOGOUT HANDLER
+    try {
+      await logout();
+      setOpen(false); // Close mobile menu on logout
+    } catch (error) {
+      console.error("Logout error:", error);
+    }
   };
 
   const navVariants = {
@@ -78,6 +94,32 @@ const Navigation = () => {
 
         {/* Right Section */}
         <div className="flex items-center gap-4">
+          {/* Auth Section */} {/* NEW AUTH UI */}
+          {user ? (
+            <div className="flex items-center gap-2">
+              <Avatar
+                src={user.photoURL}
+                alt={user.displayName || "User"}
+                size="sm"
+                className="border-2 border-accent"
+              />
+              <Button
+                onClick={handleLogout}
+                variant="text"
+                className="dark:text-white text-secondary hover:bg-accent/10"
+              >
+                Logout
+              </Button>
+            </div>
+          ) : (
+            <Button
+              onClick={googleLogin}
+              variant="filled"
+              className="bg-accent text-black hover:bg-accent/90"
+            >
+              Sign in
+            </Button>
+          )}
           {/* Theme Toggle */}
           <motion.button
             onClick={toggleTheme}
@@ -91,7 +133,6 @@ const Navigation = () => {
               <MoonIcon className="h-5 w-5" />
             )}
           </motion.button>
-
           <IconButton
             variant="text"
             className="ss:hidden text-inherit hover:bg-transparent focus:bg-transparent"
@@ -133,6 +174,32 @@ const Navigation = () => {
               </NavLink>
             </motion.div>
           ))}
+          {/* Mobile Auth Section */} {/* NEW MOBILE AUTH UI */}
+          {user ? (
+            <motion.div
+              whileHover={{ x: 10 }}
+              transition={{ type: "spring", stiffness: 300 }}
+            >
+              <button
+                onClick={handleLogout}
+                className="w-full text-left py-2 dark:hover:text-accent hover:text-secondary hover:font-semibold"
+              >
+                Logout
+              </button>
+            </motion.div>
+          ) : (
+            <motion.div
+              whileHover={{ x: 10 }}
+              transition={{ type: "spring", stiffness: 300 }}
+            >
+              <button
+                onClick={googleLogin}
+                className="w-full text-left py-2 dark:hover:text-accent hover:text-secondary hover:font-semibold"
+              >
+                Sign in with Google
+              </button>
+            </motion.div>
+          )}
         </motion.div>
       </Collapse>
     </Navbar>
