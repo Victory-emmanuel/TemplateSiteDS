@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { Typography, Button } from "@material-tailwind/react";
+import { Typography } from "@material-tailwind/react";
 import { Link } from "react-router-dom";
 import { FaEnvelope, FaPhone } from "react-icons/fa";
 

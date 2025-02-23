@@ -1,5 +1,4 @@
 /* eslint-disable react/prop-types */
-
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -16,6 +15,11 @@ import BuyNowButton from "./BuyNowButton";
 const TemplateCard = ({ template }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
+  // Safe value accessors
+  const priceNGN = template.priceNGN ?? 0;
+  const discountPriceNGN = template.discountPriceNGN ?? 0;
+  const rating = template.rating ?? 0;
+
   return (
     <>
       <Card className="overflow-hidden bg-primary/80 dark:bg-secondary">
@@ -27,7 +31,7 @@ const TemplateCard = ({ template }) => {
           <img
             src={template.image || "/placeholder.svg"}
             alt={template.name}
-            className="w-full h-full object-cover  shadow-lg shadow-primary"
+            className="w-full h-full object-cover shadow-lg shadow-primary"
           />
         </CardHeader>
         <CardBody className="flex-grow">
@@ -45,27 +49,25 @@ const TemplateCard = ({ template }) => {
               <FaStar
                 key={i}
                 className={`h-5 w-5 ${
-                  i < Math.floor(template.rating)
-                    ? "text-yellow-300"
-                    : "text-white"
+                  i < Math.floor(rating) ? "text-yellow-300" : "text-white"
                 }`}
               />
             ))}
             <span className="ml-2 text-secondary dark:text-primary">
-              {template.rating.toFixed(1)}
+              {rating.toFixed(1)}
             </span>
           </div>
           <div className="flex items-center">
-            {template.discountPrice ? (
+            {discountPriceNGN > 0 ? (
               <>
                 <Typography
                   variant="h6"
                   className="line-through mr-2 text-secondary dark:text-primary"
                 >
-                  ${template.price.toFixed(2)}
+                  ₦{priceNGN.toFixed(2)}
                 </Typography>
                 <Typography variant="h6" color="red">
-                  ${template.discountPrice.toFixed(2)}
+                  ₦{discountPriceNGN.toFixed(2)}
                 </Typography>
               </>
             ) : (
@@ -73,7 +75,7 @@ const TemplateCard = ({ template }) => {
                 variant="h6"
                 className="text-secondary dark:text-primary"
               >
-                ${template.price.toFixed(2)}
+                ₦{priceNGN.toFixed(2)}
               </Typography>
             )}
           </div>

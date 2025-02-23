@@ -1,12 +1,12 @@
 import { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@material-tailwind/react";
-import { templates } from "../data/templates";
 import FilterSidebar from "../components/Template/FilterSidebar";
 import TemplateCard from "../components/Template/TemplatesCard";
 import TemplateListItem from "../components/Template/TemplateListItems";
 import TemplateOptions from "../components/Template/TemplateOptions";
 import SearchBar from "../components/Template/SearchBar";
+import { getTemplates } from "../services/templateService";
 
 const Templates = () => {
   const [isFilterOpen, setIsFilterOpen] = useState(true);
@@ -14,9 +14,61 @@ const Templates = () => {
   const [selectedPages, setSelectedPages] = useState([]);
   const [sortOption, setSortOption] = useState("popular");
   const [viewMode, setViewMode] = useState("grid");
-  const [filteredTemplates, setFilteredTemplates] = useState(templates);
+  const [filteredTemplates, setFilteredTemplates] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
+  const [templates, setTemplates] = useState([]);
 
+  useEffect(() => {
+    const loadTemplates = async () => {
+      const data = await getTemplates();
+      setTemplates(data);
+      setFilteredTemplates(data);
+    };
+    loadTemplates();
+  }, []);
+
+  useEffect(() => {
+    let result = [...templates];
+
+    if (searchTerm) {
+      result = result.filter((template) =>
+        template.name.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+    }
+
+    if (selectedCategories.length > 0) {
+      result = result.filter((template) =>
+        selectedCategories.includes(template.category)
+      );
+    }
+
+    if (selectedPages.length > 0) {
+      result = result.filter((template) =>
+        selectedPages.includes(getPageRange(template.pages))
+      );
+    }
+
+    switch (sortOption) {
+      case "popular":
+        result.sort((a, b) => b.rating - a.rating);
+        break;
+      case "newest":
+        result.sort((a, b) => b.createdAt - a.createdAt);
+        break;
+      case "priceAsc":
+        result.sort((a, b) => a.priceNGN - b.priceNGN);
+        break;
+      case "priceDesc":
+        result.sort((a, b) => b.priceNGN - a.priceNGN);
+        break;
+      default:
+        break;
+    }
+
+    setFilteredTemplates(result);
+  }, [templates, selectedCategories, selectedPages, sortOption, searchTerm]);
+
+  // Rest of the component remains the same until return statement
   const toggleCategory = (categoryId) => {
     setSelectedCategories((prev) =>
       prev.includes(categoryId)
@@ -50,51 +102,6 @@ const Templates = () => {
     if (pages <= 5) return "5";
     return "5+";
   }, []);
-
-  useEffect(() => {
-    let result = templates;
-
-    if (searchTerm) {
-      result = result.filter((template) =>
-        template.name.toLowerCase().includes(searchTerm.toLowerCase())
-      );
-    }
-
-    if (selectedCategories.length > 0) {
-      result = result.filter((template) =>
-        selectedCategories.includes(template.category)
-      );
-    }
-
-    if (selectedPages.length > 0) {
-      result = result.filter((template) =>
-        selectedPages.includes(getPageRange(template.pages))
-      );
-    }
-
-    switch (sortOption) {
-      case "popular":
-        result.sort((a, b) => b.rating - a.rating);
-        break;
-      case "newest":
-        // Assuming we had a 'createdAt' field, we would sort by that here
-        break;
-      case "priceAsc":
-        result.sort(
-          (a, b) => (a.discountPrice || a.price) - (b.discountPrice || b.price)
-        );
-        break;
-      case "priceDesc":
-        result.sort(
-          (a, b) => (b.discountPrice || b.price) - (a.discountPrice || a.price)
-        );
-        break;
-      default:
-        break;
-    }
-
-    setFilteredTemplates(result);
-  }, [selectedCategories, selectedPages, sortOption, searchTerm, getPageRange]);
 
   return (
     <motion.div

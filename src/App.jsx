@@ -8,8 +8,7 @@ import Components from "./pages/Components";
 import Templates from "./pages/Templates";
 import Pricing from "./pages/Pricing";
 import Navigation from "./components/Universal/Navigation";
-import FooterSection from "./components/Universal/FooterSection";
-import TempMigrationPage from "./pages/TempMigrationPage";
+import { FooterSection } from "./components/Universal/FooterSection";
 
 function App() {
   useEffect(() => {
@@ -39,8 +38,6 @@ function App() {
           <Route path="/components" element={<Components />} />
           <Route path="/templates" element={<Templates />} />
           <Route path="/pricing" element={<Pricing />} />
-
-          <Route path="/migrate" element={<TempMigrationPage />} />
         </Routes>
         <FooterSection />
       </BrowserRouter>

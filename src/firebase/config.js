@@ -1,5 +1,5 @@
-// Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
+import { getFirestore } from "firebase/firestore"; // Add this import
 
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
@@ -10,4 +10,8 @@ const firebaseConfig = {
   appId: import.meta.env.VITE_FIREBASE_APP_ID,
 };
 
-export const app = initializeApp(firebaseConfig); // Must have this line
+// Initialize Firebase
+export const app = initializeApp(firebaseConfig);
+
+// Initialize Firestore and export it
+export const db = getFirestore(app); // Add this line
